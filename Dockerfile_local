@@ -1,0 +1,34 @@
+# use lightweight python image:
+FROM python:3.11-slim
+
+# set working directory:
+WORKDIR /app
+
+# set environment variables:
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1
+
+# install system dependencies:
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+# copy only requirements first for better caching:
+COPY src/requirements.txt .
+
+# install python dependencies:
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+# copy application code:
+COPY src/ .
+
+# expose port:
+EXPOSE 8000
+
+# health check:
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD python -c "import requests; requests.get('http://localhost:8000')" || exit 1
+
+# run application:
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
