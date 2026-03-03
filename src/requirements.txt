@@ -1,0 +1,14 @@
+# note: didnt pass any specified version to resolve conmflicts: 
+
+fastapi
+uvicorn[standard]
+sqlalchemy
+aiosqlite
+pydantic
+python-dotenv
+pyjwt
+redis
+aioredis
+
+psycopg2-binary # for deployment, not needed for sqlite
+passlib[bcrypt]
